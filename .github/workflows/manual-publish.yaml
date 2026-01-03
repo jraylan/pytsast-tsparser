@@ -59,23 +59,3 @@ jobs:
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Create Git tag
-        if: ${{ !inputs.dry-run && inputs.version != '' }}
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add package.json package-lock.json .release-please-manifest.json || true
-          git commit -m "chore: release v${{ steps.package-version.outputs.version }}" || echo "No changes to commit"
-          git tag -a "v${{ steps.package-version.outputs.version }}" -m "Release v${{ steps.package-version.outputs.version }}"
-          git push origin main --tags || echo "Failed to push, may need permissions"
-
-      - name: Summary
-        run: |
-          echo "## Published Package" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Package:** @pytsast/tsparser" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** ${{ steps.package-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Dry Run:** ${{ inputs.dry-run }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "[View on npm](https://www.npmjs.com/@pytsast/tsparser)" >> $GITHUB_STEP_SUMMARY
